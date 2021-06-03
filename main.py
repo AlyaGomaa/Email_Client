@@ -1,11 +1,12 @@
 from smtplib import *
 from email.mime.text import MIMEText
 
+
 class EmailSender:
-    def __init__(self, mail_sender, password, recipient, subject, message_body):
+    def __init__(self, mail_sender, password, mail_recipients, subject, message_body):
         self.mail_sender = mail_sender
         self.password = password
-        self.recipients = recipient
+        self.recipients = mail_recipients
         self.subject = subject
         self.message_body = message_body
         self.smtp_ssl_host = 'smtp.gmail.com'
@@ -22,9 +23,9 @@ class EmailSender:
         message['To'] = self.recipients
 
         # connect to Google's servers using SSL
-        server = SMTP(self.smtp_ssl_host, self.smtp_ssl_port )
+        server = SMTP(self.smtp_ssl_host, self.smtp_ssl_port)
 
-        server.connect(self.smtp_ssl_host, self.smtp_ssl_port )
+        server.connect(self.smtp_ssl_host, self.smtp_ssl_port)
         server.ehlo()
         server.starttls()
         server.ehlo()
@@ -33,13 +34,13 @@ class EmailSender:
             # and then we send the message
             server.login(self.mail_sender, self.password)
             # send the actual mail
-            server.send_message( message)
+            server.send_message(message)
             server.quit()
         except SMTPAuthenticationError:
             print("Incorrect username or password.")
 
 
-#todo separate the while true loop in a different file
+# todo separate the while true loop in a different file
 
 while True:
     print("Welcome to your email client.")
@@ -58,12 +59,13 @@ while True:
     print("---------------------------------")
 
     subject = input("Subject: ")
-    #todo support multiline msg body
+    # todo support multiline msg body
     message_body = input("Msg to send: ")
 
     try:
         # Create an instance
-        EmailSender_  = EmailSender(mail_sender, password, mail_recipients, subject, message_body )
+        EmailSender_ = EmailSender(
+            mail_sender, password, mail_recipients, subject, message_body)
         # send the mail
         EmailSender_.send_mail()
     except:
@@ -72,3 +74,4 @@ while True:
     # mail sent, break out of the loop
     print("Mail Sent.")
     break
+
