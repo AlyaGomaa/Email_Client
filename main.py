@@ -91,7 +91,7 @@ if chose == 1:
         print(mail_recipients)
         print("---------------------------------")
         # randa.yasser1999@gmail.com
-        
+
         subject = input("Subject: ")
         # todo support multiline msg body
         message_body = input("Msg to send: ")
@@ -114,10 +114,10 @@ if chose == 1:
 else:
     print("Reading E-mail from inbox never been easier! ")
     # account credentials
-    #username = input("E-mail: ")
-    #password = input("Password: ")
-    username = "marymicky158@gmail.com"
-    password = "marymicky18M"
+    username = input("E-mail: ")
+    password = input("Password: ")
+    #username = "marymicky158@gmail.com"
+    #password = "marymicky18M"
     # create an IMAP4 class with SSL
     imap = imaplib.IMAP4_SSL("imap.gmail.com")
     # authenticate
