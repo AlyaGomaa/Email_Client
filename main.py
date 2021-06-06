@@ -7,7 +7,7 @@ import webbrowser
 import os
 import threading
 import time
-
+import sys
 
 class EmailSender:
     def __init__(self, mail_sender, password, mail_recipients, subject, message_body):
@@ -66,20 +66,23 @@ class MyThread(threading.Thread):
 
 
 print("Welcome to your email client.")
-print("To enable signing in from a non secure app like our, you need to enable less secure apps from your google settings.")
-print("To avoid the hassle, we set up a test email for you. \nFeel free to use it. here's the credentials:")
+print("To enable signing in from a non secure app like ours, you need to enable less secure apps from your google settings.")
+print("To avoid the hassle, we set up a test email for you. \nFeel free to use it. Here's the credentials:")
 print("Email: marymicky158@gmail.com ")
 print("Password: marymicky18M")
-print("--------------------------------")
+
 print("Choose your service: ")
-chose = int(input("For sending mails type 1 \nFor reading mails from inbox type 2 \n "))
+try:
+    chose = int(input("For sending mails type 1. \nFor reading mails from inbox type 2. \n>> "))
+except ValueError:
+    print("Invalid Input. Aborting.")
+    sys.exit()
 
 if chose == 1:
     # todo separate the while true loop in a different file
     while True:
-
+        print("--------------------------------\n")
         mail_sender = input("Sender Email: ")
-
         # todo hide the password from terminal
         password = input("Password: ")
 
@@ -104,6 +107,7 @@ if chose == 1:
             EmailSender_.send_mail()
         except:
             # problem with authentication, ask for username and pw again
+            print("Problem with authentication. Retry.")
             continue
         # mail sent, break out of the loop
         print("Mail Sent.")
@@ -111,8 +115,8 @@ if chose == 1:
 
 # reading mails from inbox
 
-else:
-    print("Reading E-mail from inbox never been easier! ")
+elif chose == 2:
+    print("Reading E-mail from inbox never been easier!")
     # account credentials
     username = input("E-mail: ")
     password = input("Password: ")
@@ -123,10 +127,20 @@ else:
     # authenticate
     imap.login(username, password)
     status, messages = imap.select("INBOX")
-    # number of top emails to fetch
-    N = int(input("Enter numbers of recent mail you want to fetch: "))
-    sender = input("View mails from: ")
-    typ, data = imap.search(None, 'From', sender)
+    # does the user want all inbox or emails from a specific sender?
+    sender = input("View mails from a specific sender or view all inbox?\nType 'all' or the sender's email >> ")
+    if 'all' not in sender.lower():
+        typ, data = imap.search(None, 'From', sender)
+        # number of top emails to fetch
+        N = int(input("Enter numbers of recent mail you want to fetch: "))
+    else:
+        # get all inbox
+        typ, data = imap.search(None, 'ALL')
+        # set number of top emails to fetch to 100 by default
+        N = 100
+
+
+
 
     ids = data[0]  # data is a list.
     id_list = ids.split()  # ids is a space separated string
@@ -134,9 +148,10 @@ else:
     # total number of emails
     messages = int(messages[0])
     if N > len(id_list):
+        # emails requested is less than emails in the user's inbox
         N = len(id_list)
-        print("Only found "+str(N))
-    print("\n--------------------------------")
+        print("Only found "+str(N) + " emails. Fetching..")
+    print("--------------------------------")
     for i in range(N):
         # range(messages, messages-N, -1):
         # fetch the email message by ID
@@ -169,9 +184,11 @@ else:
                         if content_type == "text/plain" and "attachment" not in content_disposition:
                             # print text/plain emails and skip attachments
                             print(body)
-                            print("-------------*************--------------")
+                print("-------------*************--------------")
 
     # close the connection and logout
     imap.close()
     imap.logout()
     print("Done")
+else:
+    print("Invalid Number. Aborting.")
