@@ -93,9 +93,12 @@ class EmailReader(threading.Thread):
                         content_type = part.get_content_type()
                         content_disposition = str(part.get("Content-Disposition"))
                         # get the email body
-                        body = part.get_payload(decode=True).decode()
-
-                        if content_type == "text/plain" and "attachment" not in content_disposition:
+                        try:
+                            body = part.get_payload(decode=True).decode()
+                        except (AttributeError, UnicodeDecodeError):
+                            body = part.get_payload()
+                        # make sure there's a body to print
+                        if content_type == "text/plain" and "attachment" not in content_disposition and len(body) >3:
                             # print text/plain emails and skip attachments
                             print(body)
                             print("-------------*************--------------")
@@ -183,11 +186,6 @@ elif chose == 2:
     # authenticate
     imap.login(username, password)
     status, messages = imap.select("INBOX")
-    # number of top emails to fetch
-    sender = input("View mails from: ")
-    N = int(input("Enter numbers of recent mail you want to fetch: "))
-
-    typ, data = imap.search(None, 'From', sender)
     # does the user want all inbox or emails from a specific sender?
     sender = input("View mails from a specific sender or view all inbox?\nType 'all' or the sender's email >> ")
     if 'all' not in sender.lower():
@@ -199,9 +197,6 @@ elif chose == 2:
         typ, data = imap.search(None, 'ALL')
         # set number of top emails to fetch to 100 by default
         N = 100
-
-
-
 
     ids = data[0]  # data is a list.
     id_list = ids.split()  # ids is a space separated string
