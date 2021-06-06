@@ -23,18 +23,18 @@ class EmailSender(threading.Thread):
 
     def send_mail(self) -> bool:
         # connect to Google's servers using SSL
-        server = SMTP(self.smtp_ssl_host, self.smtp_ssl_port)
+        self.server = SMTP(self.smtp_ssl_host, self.smtp_ssl_port)
 
-        server.connect(self.smtp_ssl_host, self.smtp_ssl_port)
-        print("connected to the server")
-        server.ehlo()
-        server.starttls()
-        server.ehlo()
+        self.server.connect(self.smtp_ssl_host, self.smtp_ssl_port)
+        print("Connected to the server...")
+        self.server.ehlo()
+        self.server.starttls()
+        self.server.ehlo()
 
         try:
             # to interact with the server, first we log in
             # and then we send the message
-            server.login(self.mail_sender, self.password)
+            self.server.login(self.mail_sender, self.password)
 
         except SMTPAuthenticationError:
             print("Incorrect username or password.")
@@ -48,15 +48,15 @@ class EmailSender(threading.Thread):
         message['Subject'] = self.subject
         message['From'] = mail_sender
         message['To'] = self.recipients
-        print("email ready")
+        print("Email ready...")
         try:
             # send the actual mail
-            server.send_message(message)
+            self.server.send_message(message)
             print("Mail sent to "+self.recipients)
         except:
             print("Problem sending Mail to "+self.recipients)
 
-        server.quit()
+        self.server.quit()
 
 
 class EmailReader(threading.Thread):
