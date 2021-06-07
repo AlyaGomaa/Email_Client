@@ -19,22 +19,19 @@ class EmailSender(threading.Thread):
         self.subject = subject
         self.message_body = message_body
         self.smtp_ssl_host = 'smtp.gmail.com'
-        self.smtp_ssl_port = 587
+        self.smtp_ssl_port = 465
 
     def send_mail(self) -> bool:
         # connect to Google's servers using SSL
-        self.server = SMTP(self.smtp_ssl_host, self.smtp_ssl_port)
-
-        self.server.connect(self.smtp_ssl_host, self.smtp_ssl_port)
-        print("Connected to the server...")
-        self.server.ehlo()
-        self.server.starttls()
+        print("Connecting to the server...")
+        self.server = SMTP_SSL(self.smtp_ssl_host, self.smtp_ssl_port)
         self.server.ehlo()
 
         try:
             # to interact with the server, first we log in
             # and then we send the message
             self.server.login(self.mail_sender, self.password)
+            print("Connected successfully.")
 
         except SMTPAuthenticationError:
             print("Incorrect username or password.")
@@ -52,11 +49,12 @@ class EmailSender(threading.Thread):
         try:
             # send the actual mail
             self.server.send_message(message)
-            print("Mail sent to "+self.recipients)
-        except:
-            print("Problem sending Mail to "+self.recipients)
+            print("Mail sent to", self.recipients)
+        except Exception as e:
+            print('Unexpected Error:', str(e))
+            print("Problem sending Mail to", self.recipients)
 
-        self.server.quit()
+        self.server.close()
 
 
 class EmailReader(threading.Thread):
@@ -158,8 +156,9 @@ if chose == 1:
 
                 # send the mail
                 EmailSender_.send_mail()
-            except:
+            except Exception as e:
                 # problem with authentication, ask for username and pw again
+                print('Unexpected Error:', str(e))
                 print("Problem with authentication. Retry.")
                 continue
             EmailSender_.start()
@@ -167,7 +166,7 @@ if chose == 1:
             threads.append(EmailSender_)
         # mails sent, break out of the loop
         for t in threads:
-            t.join
+            t.join()
 
         print("All threads done!")
         threads = []
@@ -226,3 +225,5 @@ elif chose == 2:
     print("Done")
 else:
     print("Invalid Number. Aborting.")
+
+input('Done!')
