@@ -113,9 +113,7 @@ class EmailReader(threading.Thread):
 
 print("Welcome to your email client.")
 print("To enable signing in from a non secure app like ours, you need to enable less secure apps from your google settings.")
-print("To avoid the hassle, we set up a test email for you. \nFeel free to use it. Here's the credentials:")
-print("Email: marymicky158@gmail.com ")
-print("Password: marymicky18M")
+
 
 print("Choose your service: ")
 try:
